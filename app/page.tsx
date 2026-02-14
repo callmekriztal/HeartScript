@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Calculator, Flame, MessageCircle, Sparkles, PenTool } from "lucide-react";
+import { Heart, Calculator, Flame, MessageCircle, Sparkles, PenTool, Rose } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
@@ -40,6 +40,14 @@ export default function Home() {
       color: "from-red-500 to-pink-500",
       path: "/create",
     },
+    {
+      id: "Marry",
+      title: "Meet2Marry Date",
+      description: "Discover your destined date to marry based on your Meeting Date",
+      icon: Rose,
+      color: "from-blue-500 to-red-500",
+      path: "/marry",
+    }
   ];
 
   return (
