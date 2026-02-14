@@ -21,7 +21,7 @@ export default function ValentineCardGenerator() {
             type="text"
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
-            placeholder="Enter recipient name"
+            placeholder="Enter your loved one’s name"
             className="w-full border rounded p-2"
           />
         </div>
@@ -33,7 +33,7 @@ export default function ValentineCardGenerator() {
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Write your message"
+            placeholder="Write your heartfelt message here..."
             className="w-full border rounded p-2"
           />
         </div>
@@ -41,9 +41,9 @@ export default function ValentineCardGenerator() {
       </div>
 
       <CardPreview
-  recipient={recipient}
-  message={message}
-/>
+        recipient={recipient}
+        message={message}
+      />
 
     </div>
   );
