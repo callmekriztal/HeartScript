@@ -10,11 +10,11 @@ export default function CardPreview({ recipient, message, theme }: Props) {
 
   const themeStyles: Record<string, string> = {
     romantic:
-      "bg-gradient-to-br from-pink-500 via-rose-500 to-[#800020]",
+      "bg-gradient-to-br from-[#ec4899] via-[#f43f5e] to-[#800020]",
     dark:
-      "bg-gradient-to-br from-gray-800 via-gray-900 to-black",
+      "bg-gradient-to-br from-[#1f2937] via-[#111827] to-[#000000]",
     pastel:
-      "bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200",
+      "bg-gradient-to-br from-[#fbcfe8] via-[#e9d5ff] to-[#bfdbfe]",
   };
 
   return (
@@ -30,7 +30,7 @@ export default function CardPreview({ recipient, message, theme }: Props) {
       </div>
 
       {/* glass container */}
-      <div className="relative z-10 w-full max-w-md bg-white/70 backdrop-blur-xl border border-white/40 p-8 rounded-2xl shadow-xl">
+      <div data-card-preview className="relative z-10 w-full max-w-md bg-white/70 backdrop-blur-xl border border-white/40 p-8 rounded-2xl shadow-xl">
 
         {/* title */}
         <h3 className="text-center text-xs tracking-[0.25em] text-gray-500 font-semibold mb-6">
@@ -38,7 +38,7 @@ export default function CardPreview({ recipient, message, theme }: Props) {
         </h3>
 
         {/* card */}
-        <div className="relative aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
+        <div data-card-inner className="relative aspect-[4/5] rounded-xl overflow-hidden shadow-2xl">
 
           {/* gradient theme */}
           <div className={`absolute inset-0 ${themeStyles[theme]}`} />
