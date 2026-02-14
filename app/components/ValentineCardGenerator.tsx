@@ -5,7 +5,6 @@ import CardPreview from "./CardPreview";
 import { Download, FileText, Mail, Heart, ArrowLeft, Send, Copy, Check } from "lucide-react";
 
 /* ---------------- LOVE QUOTES ---------------- */
-
 const loveQuotes: string[] = [
   "You are my today and all of my tomorrows ❤️",
   "Every love story is beautiful, but ours is my favorite 💕",
@@ -59,8 +58,6 @@ const handleReset = ()=>{
   setFont("serif");
   setStickers([]);
 };
-
-const handleClearMessage = ()=> setMessage("");
 
 const generateRandomQuote = ()=>{
   const randomIndex = Math.floor(Math.random()*loveQuotes.length);
@@ -133,6 +130,31 @@ const handleAudioUpload =
 };
 
 
+/* ---------------- SHARE LINK ---------------- */
+
+const generateShareLink = ()=>{
+  const params=new URLSearchParams({
+    to:recipient,
+    msg:message,
+    theme,
+    align:alignment,
+    font
+  });
+
+  return `${window.location.origin}/card/view?${params.toString()}`;
+};
+
+const handleCopyLink = async()=>{
+  try{
+    const link=generateShareLink();
+    await navigator.clipboard.writeText(link);
+    setShowCopied(true);
+    setTimeout(()=>setShowCopied(false),2000);
+  }catch{
+    alert("Failed to copy link");
+  }
+};
+
 /* ---------------- CARD IMAGE DOM ---------------- */
 
 const createDownloadCard = ()=>{
@@ -197,7 +219,7 @@ const renderCanvas = async()=>{
   return canvas;
 };
 
-/* ---------------- SHARE ---------------- */
+/* ---------------- DOWNLOAD ---------------- */
 
 const handleDownloadImage=async()=>{
   setIsGenerating(true);
@@ -219,20 +241,12 @@ const handleDownloadPDF=async()=>{
   setIsGenerating(false);
 };
 
+/* ---------------- EMAIL ---------------- */
+
 const handleEmail=()=>{
   const subject=encodeURIComponent("Valentine Card for "+recipient);
   const body=encodeURIComponent(`Dear ${recipient}\n\n${message}\n\nWith Love ❤️`);
   window.location.href=`mailto:?subject=${subject}&body=${body}`;
-};
-
-const handleCopyLink=async()=>{
-  setIsGenerating(true);
-  const canvas=await renderCanvas();
-  const blob=await (await fetch(canvas.toDataURL())).blob();
-  await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);
-  setShowCopied(true);
-  setTimeout(()=>setShowCopied(false),2000);
-  setIsGenerating(false);
 };
 
 /* ---------------- UI ---------------- */
@@ -259,15 +273,13 @@ style={{width:step===1?"0%":step===2?"50%":"100%"}}/>
 <div className="flex flex-col gap-6">
 
 <button onClick={generateRandomQuote}
-className="px-4 py-2 bg-[#800020] text-white rounded-lg hover:bg-[#630019] transition text-sm font-semibold">
+className="px-4 py-2 bg-[#800020] text-white rounded-lg hover:bg-[#630019]">
 💌 Generate Random Love Quote
 </button>
 
-<div>
-<label className="block text-sm font-medium text-gray-700 mb-2">To</label>
 <input value={recipient} onChange={e=>setRecipient(e.target.value)}
-className="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:border-[#800020] outline-none"/>
-</div>
+placeholder="Recipient Name"
+className="px-4 py-4 border rounded"/>
 
 <textarea value={message} onChange={e=>setMessage(e.target.value)}
 rows={5}
@@ -374,7 +386,6 @@ Continue →
 {/* STEP 2 */}
 {step===2&&(
 <div className="text-center">
-<h2 className="text-3xl font-bold mb-6">Preview</h2>
 
 <div className="flex gap-3 justify-center mb-6 flex-wrap">
 {stickerOptions.map(s=>(
@@ -408,7 +419,7 @@ Send <Send/>
 
 <button onClick={handleCopyLink} className="border p-6 rounded">
 {showCopied?<Check/>:<Copy/>}
-{showCopied?"Copied!":"Copy"}
+{showCopied?"Copied!":"Copy Link"}
 </button>
 
 <button onClick={handleDownloadImage} className="border p-6 rounded"><Download/> PNG</button>
