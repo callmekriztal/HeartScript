@@ -2,37 +2,62 @@
 
 import { useState } from "react";
 import CardPreview from "./CardPreview";
-import { Download, FileText, Mail, ArrowLeft, Send } from "lucide-react";
+import {
+  Download,
+  FileText,
+  Mail,
+  Heart,
+  ArrowLeft,
+  Send,
+  Copy,
+  Check
+} from "lucide-react";
+
+/* ---------------- LOVE QUOTES ---------------- */
+
+const loveQuotes: string[] = [
+  "You are my today and all of my tomorrows ❤️",
+  "Every love story is beautiful, but ours is my favorite 💕",
+  "You make my heart smile 😊",
+  "With you, every moment is magical ✨",
+  "I fall for you more and more every day 💖",
+  "You are the best thing that ever happened to me 💘"
+];
+
+/* ---------------- COMPONENT ---------------- */
 
 export default function ValentineCardGenerator() {
+  const [step, setStep] = useState(1);
+  const [recipient, setRecipient] = useState("");
+  const [message, setMessage] = useState("");
+  const [theme, setTheme] = useState("romantic");
+  const [alignment, setAlignment] =
+    useState<"left" | "center" | "right">("center");
+  const [font, setFont] = useState("serif");
 
-  const [step,setStep]=useState(1);
-  const [recipient,setRecipient]=useState("");
-  const [message,setMessage]=useState("");
-  const [theme,setTheme]=useState("romantic");
-  const [alignment,setAlignment]=useState<"left"|"center"|"right">("center");
-  const [font,setFont]=useState("serif");
-
-  const [stickers,setStickers]=useState<
-    {id:number;x:number;y:number;emoji:string}[]
+  const [stickers, setStickers] = useState<
+    { id: number; x: number; y: number; emoji: string }[]
   >([]);
 
-  const stickerOptions=["❤️","🌹","⭐","💖","💘","✨","🎀","💐"];
+  const [showEmoji, setShowEmoji] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showCopied, setShowCopied] = useState(false);
 
-  const addSticker=(emoji:string)=>{
-    setStickers(prev=>[
-      ...prev,
-      {id:Date.now(),x:120,y:120,emoji}
-    ]);
+  const stickerOptions = ["❤️", "🌹", "⭐", "💖", "💘", "✨", "🎀", "💐"];
+
+  /* ---------------- STICKERS ---------------- */
+
+  const addSticker = (emoji: string) => {
+    setStickers(prev => [...prev, { id: Date.now(), x: 120, y: 120, emoji }]);
   };
 
-  const moveSticker=(id:number,x:number,y:number)=>{
-    setStickers(prev =>
-      prev.map(s=>s.id===id?{...s,x,y}:s)
-    );
+  const moveSticker = (id: number, x: number, y: number) => {
+    setStickers(prev => prev.map(s => (s.id === id ? { ...s, x, y } : s)));
   };
 
-  const handleReset=()=>{
+  /* ---------------- UTIL ---------------- */
+
+  const handleReset = () => {
     setRecipient("");
     setMessage("");
     setTheme("romantic");
@@ -41,105 +66,258 @@ export default function ValentineCardGenerator() {
     setStickers([]);
   };
 
-  /* DOWNLOAD IMAGE */
+  const handleClearMessage = () => setMessage("");
 
-  const handleDownloadImage=async()=>{
-    const html2canvas=(await import("html2canvas")).default;
-    const node=document.querySelector("[data-card-inner]") as HTMLElement;
-    if(!node) return;
-
-    const canvas=await html2canvas(node,{scale:2});
-    const url=canvas.toDataURL();
-
-    const a=document.createElement("a");
-    a.href=url;
-    a.download="card.png";
-    a.click();
+  const generateRandomQuote = () => {
+    const randomIndex = Math.floor(Math.random() * loveQuotes.length);
+    setMessage(loveQuotes[randomIndex]);
   };
 
-  /* DOWNLOAD PDF */
+  /* ---------------- CREATE CARD IMAGE DOM ---------------- */
 
-  const handleDownloadPDF=async()=>{
-    const html2canvas=(await import("html2canvas")).default;
-    const {jsPDF}=await import("jspdf");
+  const createDownloadCard = () => {
+    const themeGradients: Record<string, string> = {
+      romantic: "linear-gradient(135deg,#ec4899,#f43f5e,#800020)",
+      dark: "linear-gradient(135deg,#1f2937,#111827,#000)",
+      pastel: "linear-gradient(135deg,#fbcfe8,#e9d5ff,#bfdbfe)"
+    };
 
-    const node=document.querySelector("[data-card-inner]") as HTMLElement;
-    if(!node) return;
+    const alignMap = {
+      left: "flex-start",
+      center: "center",
+      right: "flex-end"
+    };
 
-    const canvas=await html2canvas(node,{scale:2});
-    const img=canvas.toDataURL();
+    const textAlignMap = {
+      left: "left",
+      center: "center",
+      right: "right"
+    };
 
-    const pdf=new jsPDF({unit:"px",format:[400,500]});
-    pdf.addImage(img,"PNG",0,0,400,500);
-    pdf.save("card.pdf");
+    const card = document.createElement("div");
+
+    card.style.cssText = `
+      position:fixed;
+      left:-9999px;
+      width:400px;
+      height:500px;
+      border-radius:16px;
+      overflow:hidden;
+      background:${themeGradients[theme]};
+    `;
+
+    card.innerHTML = `
+      <div style="
+        position:absolute;
+        inset:0;
+        display:flex;
+        flex-direction:column;
+        align-items:${alignMap[alignment]};
+        justify-content:center;
+        text-align:${textAlignMap[alignment]};
+        color:white;
+        padding:40px;
+        font-family:'Playfair Display', serif;
+      ">
+        <div style="font-size:48px;margin-bottom:20px;">❤️</div>
+
+        <h2 style="font-size:36px;font-weight:bold;margin-bottom:20px;">
+          Dear <span style="font-style:italic;text-decoration:underline;">${
+            recipient || "Someone Special"
+          }</span>,
+        </h2>
+
+        <p style="font-size:16px;line-height:1.6;max-width:300px;margin-bottom:30px;font-family:${font};">
+          ${message || "Your beautiful message will appear here..."}
+        </p>
+
+        <div style="font-style:italic;font-size:20px;">With Love ✨</div>
+      </div>
+    `;
+    return card;
   };
 
-  const handleEmail=()=>{
-    window.location.href=`mailto:?subject=Valentine Card&body=${message}`;
+  /* ---------------- SHARE ACTIONS ---------------- */
+
+  const renderCanvas = async () => {
+    const html2canvas = (await import("html2canvas")).default;
+    const node = createDownloadCard();
+    document.body.appendChild(node);
+    const canvas = await html2canvas(node, { scale: 2, backgroundColor: "#fff" });
+    document.body.removeChild(node);
+    return canvas;
   };
 
-  /* ================================================= */
+  const handleDownloadImage = async () => {
+    try {
+      setIsGenerating(true);
+      const canvas = await renderCanvas();
+      const link = document.createElement("a");
+      link.download = "valentine-card.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      setIsGenerating(true);
+      const canvas = await renderCanvas();
+      const { jsPDF } = await import("jspdf");
+
+      const pdf = new jsPDF({ orientation: "portrait", unit: "px", format: [400, 500] });
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 0, 0, 400, 500);
+      pdf.save("valentine-card.pdf");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleEmail = () => {
+    const subject = encodeURIComponent("Valentine Card for " + recipient);
+    const body = encodeURIComponent(`Dear ${recipient}\n\n${message}\n\nWith Love ❤️`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      setIsGenerating(true);
+      const canvas = await renderCanvas();
+      const blob = await (await fetch(canvas.toDataURL())).blob();
+      await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+      setShowCopied(true);
+      setTimeout(() => setShowCopied(false), 2000);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  /* ---------------- UI ---------------- */
 
   return (
-    <main className="flex flex-col items-center p-6 max-w-6xl mx-auto">
+    <main className="flex flex-col items-center px-4 py-8 w-full max-w-6xl mx-auto min-h-screen">
 
       {/* STEP BAR */}
-      <div className="flex gap-8 mb-10">
-        {["Personalize","Preview","Send"].map((l,i)=>(
-          <div key={i} className={step>=i+1?"font-bold":"text-gray-400"}>
-            {i+1}. {l}
-          </div>
-        ))}
+      <div className="w-full max-w-2xl mb-12">
+        <div className="relative flex justify-between items-center">
+          <div className="absolute top-5 left-0 w-full h-1 bg-gray-200 rounded-full" />
+          <div
+            className="absolute top-5 left-0 h-1 bg-[#800020] rounded-full transition-all"
+            style={{ width: step === 1 ? "0%" : step === 2 ? "50%" : "100%" }}
+          />
+          <Step number={1} label="Personalize" active={step >= 1} />
+          <Step number={2} label="Preview" active={step >= 2} />
+          <Step number={3} label="Send" active={step >= 3} />
+        </div>
       </div>
 
       {/* STEP 1 */}
-      {step===1&&(
-        <div className="grid md:grid-cols-2 gap-10 w-full">
+      {step === 1 && (
+        <div className="grid lg:grid-cols-2 gap-12 w-full">
 
-          <div className="flex flex-col gap-4">
+          {/* FORM */}
+          <div className="flex flex-col gap-6">
 
             <input
               value={recipient}
-              onChange={e=>setRecipient(e.target.value)}
+              onChange={e => setRecipient(e.target.value)}
               placeholder="Recipient Name"
-              className="p-3 border rounded"
+              className="px-4 py-4 border-2 rounded-lg"
             />
 
             <textarea
               value={message}
-              onChange={e=>setMessage(e.target.value)}
-              placeholder="Message"
-              className="p-3 border rounded"
+              onChange={e => setMessage(e.target.value)}
+              placeholder="Your Message"
+              rows={5}
+              className="px-4 py-4 border-2 rounded-lg resize-none"
             />
 
-            <select value={theme} onChange={e=>setTheme(e.target.value)} className="p-3 border rounded">
+            <button
+              onClick={generateRandomQuote}
+              className="px-4 py-2 bg-[#800020] text-white rounded-lg"
+            >
+              💌 Generate Random Love Quote
+            </button>
+
+            {/* EMOJI PICKER */}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowEmoji(!showEmoji)}
+                className="text-2xl"
+              >
+                😊
+              </button>
+
+              {showEmoji && (
+                <div className="absolute z-50 bg-white border rounded-xl p-3 shadow">
+                  <div className="grid grid-cols-6 gap-1">
+                    {["❤️","😍","💕","💖","🌹","✨","💌"].map(e => (
+                      <button
+                        key={e}
+                        onClick={() => {
+                          setMessage(prev => prev + e);
+                          setShowEmoji(false);
+                        }}
+                      >
+                        {e}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* THEME */}
+            <select value={theme} onChange={e => setTheme(e.target.value)}
+              className="px-4 py-3 border rounded">
               <option value="romantic">Romantic</option>
               <option value="dark">Dark</option>
               <option value="pastel">Pastel</option>
             </select>
 
-            <select value={font} onChange={e=>setFont(e.target.value)} className="p-3 border rounded">
+            {/* FONT */}
+            <select value={font} onChange={e => setFont(e.target.value)}
+              className="px-4 py-3 border rounded">
               <option value="serif">Serif</option>
-              <option value="sans-serif">Sans</option>
-              <option value="cursive">Cursive</option>
+              <option value="'Great Vibes',cursive">Script</option>
+              <option value="'Pacifico',cursive">Fun</option>
             </select>
 
-            <div className="flex gap-2">
-              {["left","center","right"].map(a=>(
-                <button key={a} onClick={()=>setAlignment(a as any)} className="border p-2 flex-1">
+            {/* ALIGNMENT */}
+            <div className="grid grid-cols-3 gap-2">
+              {["left", "center", "right"].map(a => (
+                <button
+                  key={a}
+                  onClick={() => setAlignment(a as any)}
+                  className={`py-2 border rounded ${
+                    alignment === a ? "bg-[#800020] text-white" : ""
+                  }`}
+                >
                   {a}
                 </button>
               ))}
             </div>
 
-            <div className="flex gap-3">
-              <button onClick={handleReset} className="border p-3 flex-1">Reset</button>
-              <button onClick={()=>setStep(2)} className="bg-black text-white p-3 flex-1">
-                Preview →
+            <div className="flex gap-4">
+              <button onClick={handleReset} className="flex-1 border py-3 rounded">
+                Reset
+              </button>
+
+              <button
+                disabled={!recipient || !message}
+                onClick={() => setStep(2)}
+                className="flex-1 bg-[#800020] text-white py-3 rounded disabled:opacity-50"
+              >
+                Continue →
               </button>
             </div>
           </div>
 
+          {/* PREVIEW */}
           <CardPreview
             recipient={recipient}
             message={message}
@@ -153,15 +331,14 @@ export default function ValentineCardGenerator() {
       )}
 
       {/* STEP 2 */}
-      {step===2&&(
-        <div className="text-center w-full">
+      {step === 2 && (
+        <div className="text-center">
 
           <h2 className="text-3xl font-bold mb-6">Preview</h2>
 
-          {/* sticker panel */}
           <div className="flex gap-3 justify-center mb-6 flex-wrap">
-            {stickerOptions.map(s=>(
-              <button key={s} onClick={()=>addSticker(s)} className="text-2xl border px-3 py-2 rounded">
+            {stickerOptions.map(s => (
+              <button key={s} onClick={() => addSticker(s)} className="text-2xl">
                 {s}
               </button>
             ))}
@@ -177,31 +354,79 @@ export default function ValentineCardGenerator() {
             moveSticker={moveSticker}
           />
 
-          <div className="flex justify-center gap-4 mt-8">
-            <button onClick={()=>setStep(1)} className="border px-6 py-3">
-              <ArrowLeft/> Back
+          <div className="flex gap-4 justify-center mt-8">
+            <button onClick={() => setStep(1)} className="border px-6 py-3">
+              <ArrowLeft /> Back
             </button>
 
-            <button onClick={()=>setStep(3)} className="bg-black text-white px-6 py-3">
-              Continue <Send/>
+            <button onClick={() => setStep(3)} className="bg-[#800020] text-white px-6 py-3">
+              Send <Send />
             </button>
           </div>
         </div>
       )}
 
       {/* STEP 3 */}
-      {step===3&&(
-        <div className="text-center">
+      {step === 3 && (
+        <div className="text-center max-w-xl">
 
-          <h2 className="text-3xl font-bold mb-8">Share</h2>
+          <Heart className="mx-auto w-12 h-12 text-[#800020] mb-4 animate-pulse" />
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <button onClick={handleDownloadImage} className="border p-6"><Download/> PNG</button>
-            <button onClick={handleDownloadPDF} className="border p-6"><FileText/> PDF</button>
-            <button onClick={handleEmail} className="border p-6"><Mail/> Email</button>
+          <h2 className="text-3xl font-bold mb-2">Send Your Card</h2>
+          <p className="mb-8 text-gray-600">Choose how to share it</p>
+
+          <div className="grid grid-cols-2 gap-4">
+
+            <button onClick={handleEmail} className="border p-6 rounded">
+              <Mail /> Email
+            </button>
+
+            <button onClick={handleCopyLink} className="border p-6 rounded">
+              {showCopied ? <Check /> : <Copy />}
+              {showCopied ? "Copied!" : "Copy"}
+            </button>
+
+            <button onClick={handleDownloadImage} className="border p-6 rounded">
+              <Download /> PNG
+            </button>
+
+            <button onClick={handleDownloadPDF} className="border p-6 rounded">
+              <FileText /> PDF
+            </button>
+
           </div>
+
+          <button onClick={() => setStep(2)} className="mt-8 underline">
+            ← Back
+          </button>
         </div>
       )}
     </main>
+  );
+}
+
+/* ---------------- STEP COMPONENT ---------------- */
+
+function Step({
+  number,
+  label,
+  active
+}: {
+  number: number;
+  label: string;
+  active: boolean;
+}) {
+  return (
+    <div className="flex flex-col items-center gap-2 z-10">
+      <div
+        className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold
+        ${active ? "bg-[#800020] text-white" : "bg-white border text-gray-500"}`}
+      >
+        {number}
+      </div>
+      <span className={active ? "text-[#800020]" : "text-gray-500"}>
+        {label}
+      </span>
+    </div>
   );
 }

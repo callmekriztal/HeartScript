@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Calculator, Flame, MessageCircle, Sparkles, PenTool } from "lucide-react";
+import { Heart, Calculator, Flame, MessageCircle, Sparkles, PenTool, Rose, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import FloatingHearts from "./algorithms/flames/FloatingHearts";
@@ -43,6 +43,14 @@ export default function Home() {
       path: "/create",
     },
     {
+      id: "Marry",
+      title: "Meet2Marry Date",
+      description: "Discover your destined date to marry based on your Meeting Date",
+      icon: Rose,
+      color: "from-blue-500 to-red-500",
+      path: "/marry",
+    },
+    {
       id: "truth-or-dare",
       title: "Truth or Dare",
       description: "A Valentine’s twist on Truth or Dare with sweet questions and romantic challenges made to bring you closer. 💘",
@@ -51,15 +59,21 @@ export default function Home() {
       path: "/truth-or-dare",
     },
     {
-  id: "love-quiz",
-  title: "Love Quiz",
-  description: "Answer romantic questions and discover your love compatibility score 💕",
-  icon: Heart,
-  color: "from-rose-500 to-pink-500",
-  path: "/love-quiz",
-},
-
-
+      id: "drake-equation",
+      title: "Drake Equation",
+      description: "Calculate your potential soulmates using Drake Equation",
+      icon: Search,
+      color: "from-indigo-500 to-purple-500",
+      path: "/drake-equation",
+    },
+    {
+      id: "love-quiz",
+      title: "Love Quiz",
+      description: "Answer romantic questions and discover your love compatibility score 💕",
+      icon: Heart,
+      color: "from-rose-500 to-pink-500",
+      path: "/love-quiz",
+    },
   ];
 
   return (

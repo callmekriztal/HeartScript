@@ -8,10 +8,18 @@ export default function NicknameGeneratorPage() {
   const [name1, setName1] = useState("");
   const [name2, setName2] = useState("");
   const [result, setResult] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  function handleGenerate() {
+  async function handleGenerate() {
+    setIsLoading(true);
+
+    // small delay to show loading animation (UI only)
+    await new Promise((resolve) => setTimeout(resolve, 600));
+
     const nickname = generateCoupleNickname(name1, name2);
     setResult(nickname);
+
+    setIsLoading(false);
   }
 
   return (
@@ -29,7 +37,8 @@ export default function NicknameGeneratorPage() {
           placeholder="Enter first name"
           value={name1}
           onChange={(e) => setName1(e.target.value)}
-          className="w-full p-3 rounded-lg bg-black/30 border border-white/10 outline-none"
+          className="w-full p-3 rounded-lg bg-white text-black border border-gray-300 outline-none
+          focus:outline-none focus:ring-4 focus:ring-pink-400/70 focus:border-pink-500 transition duration-200"
         />
 
         {/* Name 2 */}
@@ -38,15 +47,25 @@ export default function NicknameGeneratorPage() {
           placeholder="Enter second name"
           value={name2}
           onChange={(e) => setName2(e.target.value)}
-          className="w-full p-3 rounded-lg bg-black/30 border border-white/10 outline-none"
+          className="w-full p-3 rounded-lg bg-white text-black border border-gray-300 outline-none
+          focus:outline-none focus:ring-4 focus:ring-pink-400/70 focus:border-pink-500 transition duration-200"
         />
 
         {/* Button */}
         <button
           onClick={handleGenerate}
-          className="w-full p-3 rounded-lg bg-pink-500 hover:bg-pink-600 transition"
+          disabled={isLoading}
+          className="w-full p-3 rounded-lg bg-pink-500 hover:bg-pink-600 transition
+          disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
-          Generate Nickname
+          {isLoading ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+              Generating...
+            </>
+          ) : (
+            "Generate Nickname"
+          )}
         </button>
 
         {/* Result */}
