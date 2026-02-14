@@ -48,6 +48,15 @@ export default function Home() {
       color: "from-red-500 to-pink-500",
       path: "/truth-or-dare",
     },
+    {
+  id: "love-quiz",
+  title: "Love Quiz",
+  description: "Answer romantic questions and discover your love compatibility score 💕",
+  icon: Heart,
+  color: "from-rose-500 to-pink-500",
+  path: "/love-quiz",
+},
+
 
   ];
 
