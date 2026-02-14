@@ -37,8 +37,7 @@ body {
 }
 
 @keyframes pulse-slow {
-  0%,
-  100% {
+  0%, 100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -88,4 +87,13 @@ body {
 
 .animate-heartbeat {
   animation: heartbeat 2s infinite;
+}
+
+.dots-overlay {
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.7) 2px,
+    transparent 2.5px
+  );
+  background-size: 30px 30px;
 }
