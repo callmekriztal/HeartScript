@@ -105,6 +105,7 @@ body {
 .animate-heartbeat {
   animation: heartbeat 2s infinite;
 }
+
 .dots-overlay {
   background-image: radial-gradient(
     circle,
